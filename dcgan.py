@@ -9,6 +9,9 @@ from keras.models import Sequential, Model
 from keras.optimizers import Adam
 import matplotlib.pyplot as plt
 import numpy as np
+import tensorflow as tf
+from keras.utils import multi_gpu_model
+
 
 class DCGAN():
     def __init__(self):
@@ -42,8 +45,10 @@ class DCGAN():
 
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
-        self.combined = Model(z, valid)
-        self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
+        with tf.device('/cpu:0'):
+         #   self.generator = multi_gpu_model(self.base_generator, gpus=16)
+            self.combined = multi_gpu_model(Model(z, valid), gpus=16)
+            self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
     def build_generator(self):
 
