@@ -102,7 +102,7 @@ class DCGAN():
     def train(self, epochs, batch_size=128, save_interval=50):
 
         # Load the dataset
-        X_train, _, _, _ = data.load_data()
+        X_train, _ = data.load_data()
 
         # Rescale -1 to 1
         # X_train = X_train / 127.5 - 1.
