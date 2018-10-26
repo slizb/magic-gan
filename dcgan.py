@@ -49,10 +49,15 @@ class DCGAN():
 
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
-        with tf.device('/cpu:0'):
+        # with tf.device('/cpu:0'):
+        #  #   self.generator = multi_gpu_model(self.base_generator, gpus=16)
+        #     self.combined = multi_gpu_model(Model(z, valid), gpus=n_gpu)
+        #     self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
+
+        # without multi_gpu
          #   self.generator = multi_gpu_model(self.base_generator, gpus=16)
-            self.combined = multi_gpu_model(Model(z, valid), gpus=n_gpu)
-            self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
+        self.combined = Model(z, valid)
+        self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
     def build_generator(self):
 
