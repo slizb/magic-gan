@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
 from keras.utils import multi_gpu_model
+from tensorflow.python.client import device_lib
 
 
 class DCGAN():
@@ -43,11 +44,14 @@ class DCGAN():
         # The discriminator takes generated images as input and determines validity
         valid = self.discriminator(img)
 
+        # detect gpus
+        n_gpu = len(self.get_available_gpus())
+
         # The combined model  (stacked generator and discriminator)
         # Trains the generator to fool the discriminator
         with tf.device('/cpu:0'):
          #   self.generator = multi_gpu_model(self.base_generator, gpus=16)
-            self.combined = multi_gpu_model(Model(z, valid), gpus=16)
+            self.combined = multi_gpu_model(Model(z, valid), gpus=n_gpu)
             self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
     def build_generator(self):
@@ -167,6 +171,12 @@ class DCGAN():
                 cnt += 1
         fig.savefig("images/mnist_%d.png" % epoch)
         plt.close()
+
+    @staticmethod
+    def get_available_gpus():
+        local_device_protos = device_lib.list_local_devices()
+        gpu_devices = [x.name for x in local_device_protos if x.device_type == 'GPU']
+        return gpu_devices
 
 
 if __name__ == '__main__':
